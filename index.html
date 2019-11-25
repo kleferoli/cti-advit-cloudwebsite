@@ -62,6 +62,8 @@
         <img src="cti_logo_details.png" alt="Canterbury Techinical Institute">
     </div>
 
+    <a href="#ex2" rel="modal:open">Import JSON</a>
+
     <p class="double" id="topic2"></p>
 
     <div id="ex1" class="modal">
@@ -168,42 +170,53 @@
               ]
           }`;
 
-        var myObj2 = JSON.parse(myAllCourseTopics);
-        document.getElementById("topic2").innerHTML = myObj2.name;
-        $("#topic2").attr('data-course-code', myObj2.code);
+        function addFilter() {
+          $('.btnFilter').on("click", function () {
+              var text = $(this).siblings('input.filter').val().toLowerCase();
+              if (text) {
+                  $(this).parent().siblings("li.sub-unit").each(function (idx, element) {
 
-        for (var myObj3 in myObj2.units) {
-
-            $('#topic3').append('<li data-unit-id="' + myObj2.units[myObj3].code + '" class="unit"><h3 class="title"> ' + myObj2.units[myObj3].name + '</h3><ul id="unit' + myObj2.units[myObj3].code +'-list" data-subunit-id="' + myObj2.units[myObj3].code + '"><div class="filter-content"><h3 class="filter-title">Filter by Topic</h3><input type="text" class="filter"><button class="btnFilter">Filter</button></div></ul> </li>');
-            for (var myObj4 in myObj2.units[myObj3].EPC) {
-                $('#unit' + myObj2.units[myObj3].code + 'list').
-                    append('<li id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '" class="sub-unit">' + myObj4 + ' ' + myObj2.units[myObj3].EPC[myObj4].name + '</li>');
-
-                $('#unit' + myObj2.units[myObj3].code + '-list').
-                    append('<li class="sub-unit" id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc"><h4 data-unit-id="' + myObj4 + '">' + myObj2.units[myObj3].EPC[myObj4].name + '</h4><ul id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc-list"></ul></li>');
-                for (var myObj5 in myObj2.units[myObj3].EPC[myObj4].pc) {
-                    $('#unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc-list').
-                        append('<li class="lesson" data-class-id="' + myObj5 + '"> ' +  myObj2.units[myObj3].EPC[myObj4].pc[myObj5].text + '</li>');
-                }
-            }
+                      var title = $(element).find('h4');
+                      if (!title.text().toLowerCase().includes(text)) {
+                          $(element).hide();
+                      }
+                  });
+              } else {
+                  $("li.sub-unit").each(function (idx, element) {
+                      $(element).show();
+                  });
+              }
+          })
         }
 
-        $('.btnFilter').on("click", function () {
-            var text = $(this).siblings('input.filter').val().toLowerCase();
-            if (text) {
-                $(this).parent().siblings("li.sub-unit").each(function (idx, element) {
+        function create_html(object) {
+          var myObj2 = object;
 
-                    var title = $(element).find('h4');
-                    if (!title.text().toLowerCase().includes(text)) {
-                        $(element).hide();
-                    }
-                });
-            } else {
-                $("li.sub-unit").each(function (idx, element) {
-                    $(element).show();
-                });
-            }
-        })
+          document.getElementById("topic2").innerHTML = myObj2.name;
+          $("#topic2").attr('data-course-code', myObj2.code);
+
+          $('#topic3').html("");
+
+          for (var myObj3 in myObj2.units) {
+
+              $('#topic3').append('<li data-unit-id="' + myObj2.units[myObj3].code + '" class="unit"><h3 class="title"> ' + myObj2.units[myObj3].name + '</h3><ul id="unit' + myObj2.units[myObj3].code +'-list" data-subunit-id="' + myObj2.units[myObj3].code + '"><div class="filter-content"><h3 class="filter-title">Filter by Topic</h3><input type="text" class="filter"><button class="btnFilter">Filter</button></div></ul> </li>');
+              for (var myObj4 in myObj2.units[myObj3].EPC) {
+                  $('#unit' + myObj2.units[myObj3].code + 'list').
+                      append('<li id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '" class="sub-unit">' + myObj4 + ' ' + myObj2.units[myObj3].EPC[myObj4].name + '</li>');
+
+                  $('#unit' + myObj2.units[myObj3].code + '-list').
+                      append('<li class="sub-unit" id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc"><h4 data-unit-id="' + myObj4 + '">' + myObj2.units[myObj3].EPC[myObj4].name + '</h4><ul id="unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc-list"></ul></li>');
+                  for (var myObj5 in myObj2.units[myObj3].EPC[myObj4].pc) {
+                      $('#unit-' + myObj2.units[myObj3].code + '-' + myObj4 + '-pc-list').
+                          append('<li class="lesson" data-class-id="' + myObj5 + '"> ' +  myObj2.units[myObj3].EPC[myObj4].pc[myObj5].text + '</li>');
+                  }
+              }
+          }
+
+          addFilter();
+        }
+
+        create_html(JSON.parse(myAllCourseTopics));
 
         $('.open_modal').on('click', function() {
           $('ul.filtered_units').html("");
@@ -252,6 +265,13 @@
           });
           $.modal.close();
           alert(JSON.stringify(newJson));
+        });
+
+        $('.import_json').on('click', function() {
+          var new_json= JSON.parse($('textarea.input_json').val());
+          create_html(new_json);
+          $('.input_json').val("");
+          $.modal.close();
         });
 
     </script>
